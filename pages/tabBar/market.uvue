@@ -1,0 +1,19 @@
+<template>
+  <view class="uni-container">
+    <page-head title="商城"></page-head>
+    <view class="uni-padding-wrap">
+      <!-- 商城内容待添加 -->
+    </view>
+  </view>
+</template>
+
+<script lang="uts">
+  export default {
+    data() {
+      return {}
+    }
+  }
+</script>
+
+<style>
+</style>

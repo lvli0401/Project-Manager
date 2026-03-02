@@ -1,0 +1,102 @@
+<template>
+  <!-- #ifdef APP -->
+  <scroll-view class="page-scroll-view">
+  <!-- #endif -->
+    <view>
+      <page-head title="上传"></page-head>
+      <view class="uni-padding-wrap uni-common-mt">
+        <view class="demo">
+          <image v-if="imageSrc" :src="imageSrc" class="image" mode="widthFix"></image>
+          <text v-else class="uni-hello-addfile" @click="chooseImage">+ 选择图片</text>
+        </view>
+      </view>
+    </view>
+  <!-- #ifdef APP -->
+  </scroll-view>
+  <!-- #endif -->
+</template>
+
+<script lang="uts">
+  export default {
+    data() {
+      return {
+        imageSrc: '',
+        task: null as UploadTask | null,
+      }
+    },
+    onUnload() {
+      this.imageSrc = '';
+      uni.hideLoading();
+      this.task?.abort();
+    },
+    methods: {
+      chooseImage: function () {
+        uni.chooseImage({
+          count: 1,
+          sizeType: ['compressed'],
+          sourceType: ['album'],
+          success: (res) => {
+            console.log('chooseImage success, temp path is', res.tempFilePaths[0])
+            var imageSrc = res.tempFilePaths[0]
+            uni.showLoading({
+              title: '上传中'
+            })
+            this.task = uni.uploadFile({
+              url: 'https://unidemo.dcloud.net.cn/upload', //仅为示例，非真实的接口地址
+              filePath: imageSrc,
+              name: 'file',
+              formData: {
+                'user': 'test'
+              },
+              success: (res) => {
+                console.log('uploadImage success, res is:', res)
+                uni.showToast({
+                  title: '上传成功',
+                  icon: 'success',
+                  duration: 1000
+                })
+                this.imageSrc = imageSrc
+              },
+              fail: (err) => {
+                console.log('uploadImage fail', err);
+                uni.showModal({
+                  content: err.errMsg,
+                  showCancel: false
+                });
+              },
+              complete: (res) => {
+                uni.hideLoading();
+                this.task = null
+              }
+            });
+          },
+          fail: (err) => {
+            console.log('chooseImage fail', err)
+          }
+        })
+      }
+    }
+  }
+</script>
+
+<style>
+  .image {
+    width: 100%;
+  }
+
+  .demo {
+    background: #fff;
+    padding: 25px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .uni-hello-addfile {
+    text-align: center;
+    background: #fff;
+    padding: 25px;
+    margin-top: 10px;
+    font-size: 19px;
+    color: #808080;
+  }
+</style>
